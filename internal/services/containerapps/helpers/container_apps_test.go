@@ -67,3 +67,22 @@ func TestValidateContainerAppRegistry(t *testing.T) {
 		}
 	}
 }
+
+// Azure may omit the default HTTP scheme on read, which must not cause a diff after refresh.
+func TestContainerAppStartupProbeTransport(t *testing.T) {
+	for _, transport := range []string{"HTTP", "HTTPS", "TCP"} {
+		t.Run(transport, func(t *testing.T) {
+			probe := ExpandContainerAppStartupProbe(ContainerAppStartupProbe{
+				Transport: transport,
+				Port:      8080,
+			})
+			if transport == "HTTP" {
+				probe.HTTPGet.Scheme = nil
+			}
+
+			if got := FlattenContainerAppStartupProbe(probe)[0].Transport; got != transport {
+				t.Errorf("expected transport %q, got %q", transport, got)
+			}
+		})
+	}
+}
