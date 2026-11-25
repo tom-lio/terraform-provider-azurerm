@@ -2786,6 +2786,7 @@ func FlattenContainerAppStartupProbe(input containerapps.ContainerAppProbe) []Co
 	}
 
 	if httpGet := input.HTTPGet; httpGet != nil {
+		probe.Transport = string(containerapps.SchemeHTTP)
 		if httpGet.Scheme != nil {
 			probe.Transport = string(*httpGet.Scheme)
 		}
